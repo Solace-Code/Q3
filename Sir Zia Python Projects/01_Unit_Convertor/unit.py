@@ -1,3 +1,5 @@
+import streamlit as st
+
 def convert_length(value, from_unit, to_unit):
     units = {
         'meter': 1,
@@ -32,51 +34,31 @@ def convert_volume(value, from_unit, to_unit):
     }
     return value * units[from_unit] / units[to_unit]
 
-def main():
-    print("Welcome to the Unit Converter\n")
-    print("Select a category:")
-    print("1. Length (meter, kilometer, foot, mile)")
-    print("2. Weight (kilogram, gram, pound)")
-    print("3. Temperature (celsius, fahrenheit)")
-    print("4. Volume (liter, milliliter, gallon)\n")
+# Streamlit UI
+st.title("Unit Converter")
 
-    category_input = input("Enter category (length/weight/temperature/volume): ").strip().lower()
+category = st.selectbox("Select a category", ("Length", "Weight", "Temperature", "Volume"))
 
-    if category_input == "length":
-        print("\nAvailable units: meter, kilometer, foot, mile")
-    elif category_input == "weight":
-        print("\nAvailable units: kilogram, gram, pound")
-    elif category_input == "temperature":
-        print("\nAvailable units: celsius, fahrenheit")
-    elif category_input == "volume":
-        print("\nAvailable units: liter, milliliter, gallon")
-    else:
-        print("Invalid category. Please restart the program.")
-        return
+if category == "Length":
+    units = ["meter", "kilometer", "foot", "mile"]
+    convert_func = convert_length
+elif category == "Weight":
+    units = ["kilogram", "gram", "pound"]
+    convert_func = convert_weight
+elif category == "Temperature":
+    units = ["celsius", "fahrenheit"]
+    convert_func = convert_temperature
+elif category == "Volume":
+    units = ["liter", "milliliter", "gallon"]
+    convert_func = convert_volume
 
-    from_unit = input("Convert from: ").strip().lower()
-    to_unit = input("Convert to: ").strip().lower()
+from_unit = st.selectbox("From unit", units)
+to_unit = st.selectbox("To unit", units)
+value = st.number_input("Enter the value to convert", format="%.4f")
 
+if st.button("Convert"):
     try:
-        value = float(input("Enter the value to convert: "))
-
-        if category_input == 'length':
-            result = convert_length(value, from_unit, to_unit)
-        elif category_input == 'weight':
-            result = convert_weight(value, from_unit, to_unit)
-        elif category_input == 'temperature':
-            result = convert_temperature(value, from_unit, to_unit)
-        elif category_input == 'volume':
-            result = convert_volume(value, from_unit, to_unit)
-        else:
-            raise ValueError("Invalid category")
-
-        print(f"\nResult: {value} {from_unit} = {result:.4f} {to_unit}")
-
-    except KeyError:
-        print("Invalid unit entered.")
-    except ValueError as e:
-        print("Error:", e)
-
-if __name__ == "__main__":
-    main()
+        result = convert_func(value, from_unit, to_unit)
+        st.success(f"{value} {from_unit} = {result:.4f} {to_unit}")
+    except Exception as e:
+        st.error(f"Error: {e}")
